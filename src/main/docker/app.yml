@@ -1,0 +1,26 @@
+version: '2'
+services:
+  deh-app:
+    image: deh
+    environment:
+      - _JAVA_OPTIONS=-Xmx512m -Xms256m
+      - SPRING_PROFILES_ACTIVE=prod,swagger
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - SPRING_DATA_CASSANDRA_CONTACTPOINTS=deh-cassandra
+      - JHIPSTER_SLEEP=30 # gives time for other services to boot before the application
+    ports:
+      - 8082:8082
+  deh-cassandra:
+    extends:
+      file: cassandra-cluster.yml
+      service: deh-cassandra
+  deh-cassandra-node:
+    image: cassandra:3.11.4
+    environment:
+      - CASSANDRA_SEEDS=deh-cassandra
+  deh-cassandra-migration:
+    extends:
+      file: cassandra-migration.yml
+      service: deh-cassandra-migration
+    environment:
+      - CREATE_KEYSPACE_SCRIPT=create-keyspace-prod.cql
