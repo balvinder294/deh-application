@@ -8,6 +8,8 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
       - SPRING_DATA_CASSANDRA_CONTACTPOINTS=deh-cassandra
       - JHIPSTER_SLEEP=30 # gives time for other services to boot before the application
+      - SPRING_DATA_JEST_URI=http://deh-elasticsearch:9200
+      - SPRING_ELASTICSEARCH_REST_URIS=http://deh-elasticsearch:9200
     ports:
       - 8082:8082
   deh-cassandra:
@@ -24,3 +26,7 @@ services:
       service: deh-cassandra-migration
     environment:
       - CREATE_KEYSPACE_SCRIPT=create-keyspace-prod.cql
+  deh-elasticsearch:
+    extends:
+      file: elasticsearch.yml
+      service: deh-elasticsearch

@@ -15,7 +15,7 @@
     "databaseType": "cassandra",
     "devDatabaseType": "cassandra",
     "prodDatabaseType": "cassandra",
-    "searchEngine": false,
+    "searchEngine": "elasticsearch",
     "enableSwaggerCodegen": false,
     "messageBroker": false,
     "buildTool": "maven",

@@ -3,6 +3,7 @@ package io.deh.service;
 import io.deh.config.Constants;
 import io.deh.domain.User;
 import io.deh.repository.UserRepository;
+import io.deh.repository.search.UserSearchRepository;
 import io.deh.security.AuthoritiesConstants;
 import io.deh.security.SecurityUtils;
 import io.deh.service.dto.UserDTO;
@@ -31,11 +32,14 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final UserSearchRepository userSearchRepository;
+
     private final CacheManager cacheManager;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CacheManager cacheManager) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserSearchRepository userSearchRepository, CacheManager cacheManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userSearchRepository = userSearchRepository;
         this.cacheManager = cacheManager;
     }
 
@@ -47,6 +51,7 @@ public class UserService {
                 user.setActivated(true);
                 user.setActivationKey(null);
                 userRepository.save(user);
+                userSearchRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Activated user: {}", user);
                 return user;
@@ -110,6 +115,7 @@ public class UserService {
         authorities.add(AuthoritiesConstants.USER);
         newUser.setAuthorities(authorities);
         userRepository.save(newUser);
+        userSearchRepository.save(newUser);
         this.clearUserCaches(newUser);
         log.debug("Created Information for User: {}", newUser);
         return newUser;
@@ -143,6 +149,7 @@ public class UserService {
         user.setActivated(true);
         user.setAuthorities(userDTO.getAuthorities());
         userRepository.save(user);
+        userSearchRepository.save(user);
         this.clearUserCaches(user);
         log.debug("Created Information for User: {}", user);
         return user;
@@ -165,6 +172,7 @@ public class UserService {
                 user.setEmail(email.toLowerCase());
                 user.setLangKey(langKey);
                 userRepository.save(user);
+                userSearchRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
             });
@@ -191,6 +199,7 @@ public class UserService {
                 user.setLangKey(userDTO.getLangKey());
                 user.setAuthorities(userDTO.getAuthorities());
                 userRepository.save(user);
+                userSearchRepository.save(user);
                 this.clearUserCaches(user);
                 log.debug("Changed Information for User: {}", user);
                 return user;
@@ -201,6 +210,7 @@ public class UserService {
     public void deleteUser(String login) {
         userRepository.findOneByLogin(login).ifPresent(user -> {
             userRepository.delete(user);
+            userSearchRepository.delete(user);
             this.clearUserCaches(user);
             log.debug("Deleted User: {}", user);
         });

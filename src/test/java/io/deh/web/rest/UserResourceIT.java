@@ -4,6 +4,7 @@ import io.deh.AbstractCassandraTest;
 import io.deh.DehApp;
 import io.deh.domain.User;
 import io.deh.repository.UserRepository;
+import io.deh.repository.search.UserSearchRepository;
 import io.deh.security.AuthoritiesConstants;
 import io.deh.service.MailService;
 import io.deh.service.UserService;
@@ -62,6 +63,14 @@ public class UserResourceIT extends AbstractCassandraTest {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * This repository is mocked in the io.deh.repository.search test package.
+     *
+     * @see io.deh.repository.search.UserSearchRepositoryMockConfiguration
+     */
+    @Autowired
+    private UserSearchRepository mockUserSearchRepository;
+
     @Autowired
     private MailService mailService;
 
@@ -91,7 +100,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void setup() {
         cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).clear();
         cacheManager.getCache(UserRepository.USERS_BY_EMAIL_CACHE).clear();
-        UserResource userResource = new UserResource(userService, userRepository, mailService);
+        UserResource userResource = new UserResource(userService, userRepository, mailService, mockUserSearchRepository);
 
         this.restUserMockMvc = MockMvcBuilders.standaloneSetup(userResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
@@ -186,6 +195,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void createUserWithExistingLogin() throws Exception {
         // Initialize the database
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         ManagedUserVM managedUserVM = new ManagedUserVM();
@@ -213,6 +223,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void createUserWithExistingEmail() throws Exception {
         // Initialize the database
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
         int databaseSizeBeforeCreate = userRepository.findAll().size();
 
         ManagedUserVM managedUserVM = new ManagedUserVM();
@@ -240,6 +251,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void getAllUsers() throws Exception {
         // Initialize the database
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
 
         // Get all the users
         restUserMockMvc.perform(get("/api/users")
@@ -257,6 +269,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void getUser() throws Exception {
         // Initialize the database
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
 
         assertThat(cacheManager.getCache(UserRepository.USERS_BY_LOGIN_CACHE).get(user.getLogin())).isNull();
 
@@ -283,6 +296,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void updateUser() throws Exception {
         // Initialize the database
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
         int databaseSizeBeforeUpdate = userRepository.findAll().size();
 
         // Update the user
@@ -318,6 +332,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void updateUserLogin() throws Exception {
         // Initialize the database
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
         int databaseSizeBeforeUpdate = userRepository.findAll().size();
 
         // Update the user
@@ -354,6 +369,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void updateUserExistingEmail() throws Exception {
         // Initialize the database with 2 users
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
 
         User anotherUser = new User();
         anotherUser.setId(UUID.randomUUID().toString());
@@ -365,6 +381,7 @@ public class UserResourceIT extends AbstractCassandraTest {
         anotherUser.setLastName("hipster");
         anotherUser.setLangKey("en");
         userRepository.save(anotherUser);
+        mockUserSearchRepository.save(anotherUser);
 
         // Update the user
         User updatedUser = userRepository.findById(user.getId()).get();
@@ -390,6 +407,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void updateUserExistingLogin() throws Exception {
         // Initialize the database
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
 
         User anotherUser = new User();
         anotherUser.setId(UUID.randomUUID().toString());
@@ -401,6 +419,7 @@ public class UserResourceIT extends AbstractCassandraTest {
         anotherUser.setLastName("hipster");
         anotherUser.setLangKey("en");
         userRepository.save(anotherUser);
+        mockUserSearchRepository.save(anotherUser);
 
         // Update the user
         User updatedUser = userRepository.findById(user.getId()).get();
@@ -426,6 +445,7 @@ public class UserResourceIT extends AbstractCassandraTest {
     public void deleteUser() throws Exception {
         // Initialize the database
         userRepository.save(user);
+        mockUserSearchRepository.save(user);
         int databaseSizeBeforeDelete = userRepository.findAll().size();
 
         // Delete the user

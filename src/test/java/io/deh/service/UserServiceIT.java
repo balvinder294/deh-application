@@ -4,6 +4,7 @@ import io.deh.AbstractCassandraTest;
 import io.deh.DehApp;
 import io.deh.config.Constants;
 import io.deh.domain.User;
+import io.deh.repository.search.UserSearchRepository;
 import io.deh.repository.UserRepository;
 import io.deh.service.dto.UserDTO;
 
@@ -17,6 +18,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * Integration tests for {@link UserService}.
@@ -39,6 +43,14 @@ public class UserServiceIT extends AbstractCassandraTest {
 
     @Autowired
     private UserService userService;
+
+    /**
+     * This repository is mocked in the io.deh.repository.search test package.
+     *
+     * @see io.deh.repository.search.UserSearchRepositoryMockConfiguration
+     */
+    @Autowired
+    private UserSearchRepository mockUserSearchRepository;
 
     private User user;
 

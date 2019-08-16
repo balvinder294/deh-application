@@ -23,6 +23,10 @@ spring:
       protocolVersion: V4
       compression: NONE
       keyspaceName: cassandra_unit_keyspace
+    elasticsearch:
+      properties:
+        path:
+          home: target/elasticsearch
   mail:
     host: localhost
   main:

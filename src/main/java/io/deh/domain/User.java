@@ -5,6 +5,7 @@ import io.deh.config.Constants;
 import com.datastax.driver.mapping.annotations.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -20,11 +21,13 @@ import java.util.Set;
  * A user.
  */
 @Table(name = "user")
+@org.springframework.data.elasticsearch.annotations.Document(indexName = "user")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @PartitionKey
+    @org.springframework.data.elasticsearch.annotations.Field(type = FieldType.Keyword)
     private String id;
 
     @NotNull
